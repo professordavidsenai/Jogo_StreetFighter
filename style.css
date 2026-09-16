@@ -1,0 +1,394 @@
+:root {
+  --bg-dark: #0b0d13;
+  --bg-card: #151922;
+  --p1-color: #00d2ff;
+  --p1-glow: rgba(0, 210, 255, 0.4);
+  --p2-color: #ff3366;
+  --p2-glow: rgba(255, 51, 102, 0.4);
+  --gold: #ffcc00;
+  --hp-bg: #1c202a;
+  --hp-green: #00ff88;
+  --hp-red: #e63946;
+  --hp-lag: #f39c12;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: #fff;
+  font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  padding: 16px;
+}
+
+.arcade-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 1020px;
+  width: 100%;
+}
+
+.game-header {
+  text-align: center;
+}
+
+.arcade-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px var(--p1-glow), 0 0 30px var(--p2-glow);
+}
+
+/* Container do Jogo e Canvas */
+.game-container {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  background: #000;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 210, 255, 0.15);
+  overflow: hidden;
+  border: 2px solid #222a38;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* HUD Superior */
+.hud {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fighter-hud {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.p1-hud {
+  align-items: flex-start;
+}
+
+.p2-hud {
+  align-items: flex-end;
+}
+
+.fighter-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.p1-hud .fighter-name {
+  color: var(--p1-color);
+  text-shadow: 0 0 8px var(--p1-glow);
+}
+
+.p2-hud .fighter-name {
+  color: var(--p2-color);
+  text-shadow: 0 0 8px var(--p2-glow);
+}
+
+.fighter-hp-val {
+  color: #a0aec0;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+/* Barras de HP Dinâmicas */
+.health-bar-container {
+  position: relative;
+  width: 100%;
+  height: 22px;
+  background-color: var(--hp-bg);
+  border: 2px solid #323d4f;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.health-bar-container.flipped {
+  transform: scaleX(-1);
+}
+
+.health-bar-lag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--hp-lag);
+  transition: width 0.55s cubic-bezier(0.25, 1, 0.5, 1) 0.25s;
+}
+
+.health-bar-current {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, #ff5e62, var(--hp-red));
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.6);
+  transition: width 0.1s ease-out;
+}
+
+.p1-hud .health-bar-current {
+  background: linear-gradient(180deg, #00f2fe, #4facfe);
+  box-shadow: 0 0 8px var(--p1-glow);
+}
+
+.p2-hud .health-bar-current {
+  background: linear-gradient(180deg, #ff0844, #ffb199);
+  box-shadow: 0 0 8px var(--p2-glow);
+}
+
+.status-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #334155;
+  color: #94a3b8;
+  margin-top: 2px;
+  transition: all 0.15s ease;
+}
+
+.status-badge.stunned {
+  background: #e11d48;
+  border-color: #ffe4e6;
+  color: #fff;
+  animation: pulse-stun 0.2s infinite alternate;
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.8);
+}
+
+@keyframes pulse-stun {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* Timer Central */
+.timer-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 60px;
+  background: #11141d;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+}
+
+.timer-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8c9ba5;
+  letter-spacing: 1px;
+}
+
+.timer-number {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
+}
+
+/* Overlay de Anúncio / K.O. */
+.screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+.screen-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.banner-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 48px;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px var(--gold);
+  transform: scale(1);
+  animation: banner-zoom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sub-banner-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+@keyframes banner-zoom {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.restart-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #00d2ff, #0072ff);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.restart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.7);
+}
+
+.restart-btn:active {
+  transform: translateY(1px);
+}
+
+/* Guia de Controles */
+.controls-guide {
+  width: 960px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.guide-card, .rules-card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid #252e3e;
+}
+
+.p1-guide {
+  border-left: 4px solid var(--p1-color);
+}
+
+.p2-guide {
+  border-right: 4px solid var(--p2-color);
+}
+
+.rules-card {
+  border-top: 3px solid var(--gold);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.rules-card h3 {
+  font-size: 14px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.guide-card h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.p1-guide h3 {
+  color: var(--p1-color);
+}
+
+.p2-guide h3 {
+  color: var(--p2-color);
+  text-align: right;
+}
+
+.key-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.p2-guide .key-group {
+  justify-content: flex-end;
+}
+
+.key-badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  background: #273142;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 12px;
+  color: #fff;
+  box-shadow: 0 2px 0 #141b24;
+}
+
+.key-badge.highlight-blue {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.key-badge.highlight-red {
+  background: #e11d48;
+  border-color: #fb7185;
+  color: #fff;
+}
+
+.extra-note {
+  font-size: 11px;
+  color: #64748b;
+  text-align: right;
+  margin-top: 4px;
+}

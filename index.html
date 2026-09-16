@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Luta 2D - 2 Jogadores</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="arcade-wrapper">
+    <header class="game-header">
+      <h1 class="arcade-title">DUAL IMPACT // ARENA 2D</h1>
+    </header>
+
+    <!-- Main Game Container -->
+    <div class="game-container" id="gameContainer">
+      <!-- HUD Superior -->
+      <div class="hud">
+        <!-- Jogador 1 (Azul) -->
+        <div class="fighter-hud p1-hud">
+          <div class="fighter-info">
+            <span class="fighter-name">P1: KAZUTO</span>
+            <span class="fighter-hp-val" id="p1HpVal">100/100</span>
+          </div>
+          <div class="health-bar-container">
+            <div class="health-bar-lag" id="p1LagBar"></div>
+            <div class="health-bar-current" id="p1CurrentBar"></div>
+          </div>
+          <div class="status-badge" id="p1Status">PRONTO</div>
+        </div>
+
+        <!-- Cronômetro Central -->
+        <div class="timer-box">
+          <div class="timer-label">TEMPO</div>
+          <div class="timer-number" id="matchTimer">99</div>
+        </div>
+
+        <!-- Jogador 2 (Vermelho) -->
+        <div class="fighter-hud p2-hud">
+          <div class="fighter-info">
+            <span class="fighter-hp-val" id="p2HpVal">100/100</span>
+            <span class="fighter-name">P2: SHINOBI</span>
+          </div>
+          <div class="health-bar-container flipped">
+            <div class="health-bar-lag" id="p2LagBar"></div>
+            <div class="health-bar-current" id="p2CurrentBar"></div>
+          </div>
+          <div class="status-badge" id="p2Status">PRONTO</div>
+        </div>
+      </div>
+
+      <!-- Canvas da Luta -->
+      <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+      <!-- Mensagens de Tela (Fight, K.O., etc.) -->
+      <div class="screen-overlay" id="screenOverlay">
+        <div class="banner-text" id="bannerText">ROUND 1</div>
+        <div class="sub-banner-text" id="subBannerText">FIGHT!</div>
+        <button class="restart-btn" id="restartBtn">JOGAR NOVAMENTE [ESPAÇO]</button>
+      </div>
+    </div>
+
+    <!-- Guia de Controles dos Jogadores -->
+    <div class="controls-guide">
+      <div class="guide-card p1-guide">
+        <h3>CONTROLES DO JOGADOR 1</h3>
+        <div class="key-group">
+          <span class="key-badge">W</span> Pular
+          <span class="key-badge">A</span> Esquerda
+          <span class="key-badge">S</span> Agachar
+          <span class="key-badge">D</span> Direita
+        </div>
+        <div class="key-group attack-group">
+          <span class="key-badge highlight-blue">F</span> Soco Rápido (7 Dano)
+          <span class="key-badge highlight-blue">G</span> Chute Forte (16 Dano)
+        </div>
+      </div>
+
+      <div class="rules-card">
+        <h3>SISTEMA DE HIT-STUN</h3>
+        <p>• Acertos causam <strong>Hit-Stun</strong>: o oponente fica temporariamente congelado e sem controle.</p>
+        <p>• <strong>Golpe Forte (G / L)</strong> causa Stun longo e forte recuo (knockback).</p>
+        <p>• Aproveite a janela de stun para encaixar combos!</p>
+      </div>
+
+      <div class="guide-card p2-guide">
+        <h3>CONTROLES DO JOGADOR 2</h3>
+        <div class="key-group">
+          <span class="key-badge">▲</span> Pular
+          <span class="key-badge">◄</span> Esquerda
+          <span class="key-badge">▼</span> Agachar
+          <span class="key-badge">►</span> Direita
+        </div>
+        <div class="key-group attack-group">
+          <span class="key-badge highlight-red">K</span> Soco Rápido (7 Dano)
+          <span class="key-badge highlight-red">L</span> Chute Forte (16 Dano)
+        </div>
+        <div class="extra-note">*Também aceita NumPad 1 e 2</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
+
